@@ -2,6 +2,40 @@ import { create } from 'zustand';
 import { Balance, ReserveStatus } from '@/types';
 import { apiClient } from '@/lib/api/client';
 
+interface CachedBalance {
+  data: Balance;
+  timestamp: number;
+  ttl: number;
+}
+
+const BALANCE_TTL = 30000;
+
+function getCachedBalance(address: string): CachedBalance | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = localStorage.getItem(`balance_cache:${address}`);
+    if (!raw) return null;
+    const cached: CachedBalance = JSON.parse(raw);
+    if (Date.now() - cached.timestamp > cached.ttl) {
+      localStorage.removeItem(`balance_cache:${address}`);
+      return null;
+    }
+    return cached;
+  } catch {
+    return null;
+  }
+}
+
+function setCachedBalance(address: string, data: Balance): void {
+  if (typeof window === 'undefined') return;
+  try {
+    const entry: CachedBalance = { data, timestamp: Date.now(), ttl: BALANCE_TTL };
+    localStorage.setItem(`balance_cache:${address}`, JSON.stringify(entry));
+  } catch {
+    // localStorage full or unavailable
+  }
+}
+
 interface WalletState {
   walletAddress: string | null;
   balance: Balance | null;
@@ -11,7 +45,6 @@ interface WalletState {
   isTestnet: boolean;
   reserveStatus: ReserveStatus | null;
   
-  // Actions
   setWalletAddress: (address: string | null) => void;
   setBalance: (balance: Balance | null) => void;
   setLoading: (loading: boolean) => void;
@@ -23,7 +56,6 @@ interface WalletState {
   fetchReserveStatus: () => Promise<void>;
 }
 
-// Function to get persisted wallet address from local storage
 const getPersistedWalletAddress = (): string | null => {
   if (typeof window !== 'undefined') {
     return localStorage.getItem('persisted_wallet_address');
@@ -31,7 +63,6 @@ const getPersistedWalletAddress = (): string | null => {
   return null;
 };
 
-// Function to set persisted wallet address in local storage
 const setPersistedWalletAddress = (address: string | null) => {
   if (typeof window !== 'undefined') {
     if (address) {
@@ -43,14 +74,12 @@ const setPersistedWalletAddress = (address: string | null) => {
 };
 
 export const useWalletStore = create<WalletState>((set, get) => {
-  // Initialize testnet mode check
   const checkTestnetMode = () => {
     const testnetMode = apiClient.isTestnetMode();
     set({ isTestnet: testnetMode });
     return testnetMode;
   };
 
-  // Initial check and load persisted wallet address
   const initialWalletAddress = getPersistedWalletAddress();
   if (typeof window !== 'undefined') {
     checkTestnetMode();
@@ -84,63 +113,77 @@ export const useWalletStore = create<WalletState>((set, get) => {
       setPersistedWalletAddress(null);
     },
   
-  fetchBalance: async (address: string) => {
-    set({ isLoading: true, error: null });
-    try {
-      const response = await apiClient.checkBalance(address);
-      if (response.success) {
+    fetchBalance: async (address: string) => {
+      const cached = getCachedBalance(address);
+      if (cached) {
         set({ 
-          balance: response.data as Balance, 
-          lastUpdate: new Date(), 
+          balance: cached.data, 
+          lastUpdate: new Date(cached.timestamp), 
           isLoading: false,
           error: null 
         });
-      } else {
-        set({ error: response.error || 'Failed to fetch balance', isLoading: false });
+        return;
       }
-    } catch (error) {
-      set({ 
-        error: error instanceof Error ? error.message : 'Failed to fetch balance', 
-        isLoading: false 
-      });
-    }
-  },
+
+      set({ isLoading: true, error: null });
+      try {
+        const response = await apiClient.checkBalance(address);
+        if (response.success) {
+          const balanceData = response.data as Balance;
+          setCachedBalance(address, balanceData);
+          set({ 
+            balance: balanceData, 
+            lastUpdate: new Date(), 
+            isLoading: false,
+            error: null 
+          });
+        } else {
+          set({ error: response.error || 'Failed to fetch balance', isLoading: false });
+        }
+      } catch (error) {
+        set({ 
+          error: error instanceof Error ? error.message : 'Failed to fetch balance', 
+          isLoading: false 
+        });
+      }
+    },
   
-  fetchEnhancedBalance: async (address: string) => {
-    set({ isLoading: true, error: null });
-    try {
-      const response = await apiClient.enhancedBalanceCheck(address);
-      if (response.success) {
+    fetchEnhancedBalance: async (address: string) => {
+      set({ isLoading: true, error: null });
+      try {
+        const response = await apiClient.enhancedBalanceCheck(address);
+        if (response.success) {
+          const balanceData = response.data as Balance;
+          setCachedBalance(address, balanceData);
+          set({ 
+            balance: balanceData, 
+            lastUpdate: new Date(), 
+            isLoading: false,
+            error: null 
+          });
+        } else {
+          set({ error: response.error || 'Failed to fetch enhanced balance', isLoading: false });
+        }
+      } catch (error) {
         set({ 
-          balance: response.data as Balance, 
-          lastUpdate: new Date(), 
-          isLoading: false,
-          error: null 
+          error: error instanceof Error ? error.message : 'Failed to fetch enhanced balance', 
+          isLoading: false 
         });
-      } else {
-        set({ error: response.error || 'Failed to fetch enhanced balance', isLoading: false });
       }
-    } catch (error) {
-      set({ 
-        error: error instanceof Error ? error.message : 'Failed to fetch enhanced balance', 
-        isLoading: false 
-      });
-    }
-  },
+    },
 
-  fetchReserveStatus: async () => {
-    const isTestnet = get().isTestnet || checkTestnetMode();
-    if (!isTestnet) return;
+    fetchReserveStatus: async () => {
+      const isTestnet = get().isTestnet || checkTestnetMode();
+      if (!isTestnet) return;
 
-    try {
-      const response = await apiClient.getReserveStatus();
-      if (response.success && response.data) {
-        set({ reserveStatus: response.data as ReserveStatus });
+      try {
+        const response = await apiClient.getReserveStatus();
+        if (response.success && response.data) {
+          set({ reserveStatus: response.data as ReserveStatus });
+        }
+      } catch (error) {
+        console.error('Failed to fetch reserve status:', error);
       }
-    } catch (error) {
-      console.error('Failed to fetch reserve status:', error);
-      // Don't set error state for reserve status as it's optional
-    }
-  },
+    },
   };
 });
