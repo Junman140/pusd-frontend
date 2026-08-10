@@ -22,6 +22,7 @@ function MintContent() {
   const [hasLocalWallet, setHasLocalWallet] = useState<boolean | null>(null);
 
   useEffect(() => {
+    if (!searchParams) return;
     const tab = searchParams.get('tab');
     if (tab === 'redeem') {
       setActiveTab('redeem');
