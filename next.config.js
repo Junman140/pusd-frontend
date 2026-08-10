@@ -2,6 +2,7 @@
 const path = require('path');
 
 const nextConfig = {
+  use: 'webpack',
   webpack: (config, { isServer }) => {
  
     const noopPath = path.resolve(__dirname, 'lib', 'noop-document.js');
