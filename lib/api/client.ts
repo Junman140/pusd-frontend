@@ -251,6 +251,10 @@ class ApiClient {
     return this.request('/wallet/info');
   }
 
+  async createWallet() {
+    return this.request('/wallet/create', { method: 'POST' });
+  }
+
   async getTransactionHistory(limit?: number) {
     const params = limit ? `?limit=${limit}` : '';
     return this.request(`/stablecoin/history${params}`);

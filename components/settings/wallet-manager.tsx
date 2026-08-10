@@ -110,7 +110,7 @@ export function WalletManager() {
   const handleCreateWallet = async () => {
     setIsCreating(true);
     try {
-      const data = await apiClient.request('/wallet/create', { method: 'POST' });
+      const data = await apiClient.createWallet();
 
       if (data.success && data.data?.publicKey && data.data?.secretKey) {
         const { publicKey, secretKey, passphrase } = data.data as { publicKey: string; secretKey: string; passphrase?: string };
