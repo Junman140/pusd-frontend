@@ -179,7 +179,7 @@ export default function StatsPage() {
                   <div className="flex justify-between text-sm mb-1.5">
                     <span className="text-muted-foreground">Pi Reserve</span>
                     <span className="tabular-nums font-medium">
-                      {(collateralBreakdown as any)?.piReserve || stats.totalPiReserve).toLocaleString()} Pi
+                      {((collateralBreakdown as any)?.piReserve || stats.totalPiReserve).toLocaleString()} Pi
                     </span>
                   </div>
                   <div className="h-2 rounded-full bg-secondary overflow-hidden">
