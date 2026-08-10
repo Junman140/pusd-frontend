@@ -271,7 +271,9 @@ export interface ApiResponse {
   data?: unknown;
   error?: string;
   message?: string;
-  timestamp: string;
+  timestamp?: string;
+  publicKey?: string;
+  secret?: string;
 }
 
 export interface MintRequest {
