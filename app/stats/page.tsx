@@ -177,29 +177,29 @@ export default function StatsPage() {
               <div className="space-y-4">
                 <div>
                   <div className="flex justify-between text-sm mb-1.5">
-                    <span className="text-muted-foreground">Pi</span>
+                    <span className="text-muted-foreground">Pi Reserve</span>
                     <span className="tabular-nums font-medium">
-                      {((collateralBreakdown as any)?.piReserve || stats.totalPiReserve).toLocaleString()} Pi
+                      {(collateralBreakdown as any)?.piReserve || stats.totalPiReserve).toLocaleString()} Pi
                     </span>
                   </div>
                   <div className="h-2 rounded-full bg-secondary overflow-hidden">
                     <div 
                       className="h-full rounded-full bg-accent transition-all duration-500" 
-                      style={{ width: `${(collateralBreakdown as any)?.piRatio || 0}%` }}
+                      style={{ width: '100%' }}
                     />
                   </div>
                 </div>
                 <div>
                   <div className="flex justify-between text-sm mb-1.5">
-                    <span className="text-muted-foreground">{isTestnet ? 'USD-TEST / Cash' : 'USDC / Cash'}</span>
+                    <span className="text-muted-foreground">Collateralization Ratio</span>
                     <span className="tabular-nums font-medium">
-                      ${Number((collateralBreakdown as any)?.cashUsdReserve || stats.totalUsdReserve).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      {((collateralBreakdown as any)?.backingRatio || stats.backingRatio)?.toFixed(0) || '120'}%
                     </span>
                   </div>
                   <div className="h-2 rounded-full bg-secondary overflow-hidden">
                     <div 
-                      className="h-full rounded-full bg-foreground/30 transition-all duration-500" 
-                      style={{ width: `${(collateralBreakdown as any)?.usdRatio || 100}%` }}
+                      className="h-full rounded-full bg-success/60 transition-all duration-500" 
+                      style={{ width: `${Math.min((collateralBreakdown as any)?.backingRatio || stats.backingRatio || 120, 200)}%` }}
                     />
                   </div>
                 </div>

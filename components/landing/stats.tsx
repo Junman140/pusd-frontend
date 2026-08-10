@@ -12,7 +12,7 @@ export function LandingStats() {
   const sectionRef = useRef<HTMLElement>(null);
   
   const { stats, fetchStats } = useStatsStore();
-  const [collateral, setCollateral] = useState({ piRatio: 60, usdRatio: 40 });
+  const [collateral, setCollateral] = useState({ piRatio: 100, backingRatio: 120 });
 
   useEffect(() => {
     if (!stats) fetchStats();
@@ -22,16 +22,9 @@ export function LandingStats() {
         const res = await apiClient.getReserveStatus();
         if (res.success && res.data) {
           const status = res.data as any;
-          const totalUsd = status.totalUsdReserve || 0;
-          const cashUsd = status.cashUsdReserve || 0;
-          const tBillUsd = status.tBillUsdReserve || 0;
-          const usdSum = cashUsd + tBillUsd;
-          
-          if (totalUsd > 0) {
-            const usdRatio = (usdSum / totalUsd) * 100;
-            const piRatio = 100 - usdRatio;
-            setCollateral({ piRatio, usdRatio });
-          }
+          const backingRatio = status.backingRatio || status.collateralizationRatio || 120;
+          const piRatio = 100;
+          setCollateral({ piRatio, backingRatio });
         }
       } catch (e) {
         // Fallback to defaults
@@ -150,25 +143,25 @@ export function LandingStats() {
             <div className="space-y-4">
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">Pi</span>
-                  <span className="font-mono font-medium">{collateral.piRatio.toFixed(1)}%</span>
+                  <span className="text-muted-foreground">Pi Reserve</span>
+                  <span className="font-mono font-medium">100%</span>
                 </div>
                 <div className="h-2.5 rounded-full bg-secondary overflow-hidden">
                   <div 
                     className="h-full rounded-full bg-accent transition-all duration-1000 ease-out"
-                    style={{ width: isVisible ? `${collateral.piRatio}%` : '0%', transitionDelay: '600ms' }}
+                    style={{ width: isVisible ? '100%' : '0%', transitionDelay: '600ms' }}
                   />
                 </div>
               </div>
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">USD Cash / T-Bills</span>
-                  <span className="font-mono font-medium">{collateral.usdRatio.toFixed(1)}%</span>
+                  <span className="text-muted-foreground">Collateralization</span>
+                  <span className="font-mono font-medium">{collateral.backingRatio.toFixed(0)}%</span>
                 </div>
                 <div className="h-2.5 rounded-full bg-secondary overflow-hidden">
                   <div 
-                    className="h-full rounded-full bg-foreground/20 transition-all duration-1000 ease-out"
-                    style={{ width: isVisible ? `${collateral.usdRatio}%` : '0%', transitionDelay: '800ms' }}
+                    className="h-full rounded-full bg-success/60 transition-all duration-1000 ease-out"
+                    style={{ width: isVisible ? `${Math.min(collateral.backingRatio, 200)}%` : '0%', transitionDelay: '800ms' }}
                   />
                 </div>
               </div>
