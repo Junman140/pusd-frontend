@@ -4,10 +4,10 @@ const SERVER_API_URL = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:8
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { address: string } }
+  { params }: { params: Promise<{ address: string }> }
 ) {
   try {
-    const address = params.address;
+    const { address } = await params;
     const authHeader = request.headers.get('Authorization');
 
     const response = await fetch(`${SERVER_API_URL}/api/lending/position/${address}`, {
