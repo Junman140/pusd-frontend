@@ -358,6 +358,19 @@ class ApiClient {
       body: JSON.stringify(data),
     });
   }
+
+  // Transfer
+  async transfer(data: {
+    from: string;
+    to: string;
+    amount: number;
+    secretSeed: string;
+  }) {
+    return this.request('/stablecoin/transfer', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
 }
 
 export const apiClient = new ApiClient();

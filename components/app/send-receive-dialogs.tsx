@@ -51,16 +51,11 @@ export function SendReceiveDialogs({
     try {
       const { secretSeed } = await useAuthStore.getState().retrieveKeypairForTransaction(walletAddress);
       
-      // Since we don't have a backend transfer route yet, we'll use a placeholder or add one.
-      // For now, let's assume we use a new /stablecoin/transfer endpoint that I'll add.
-      const response = await apiClient.request('/stablecoin/transfer', {
-        method: 'POST',
-        body: JSON.stringify({
-          from: walletAddress,
-          to: recipient,
-          amount: parseFloat(amount),
-          secretSeed,
-        }),
+      const response = await apiClient.transfer({
+        from: walletAddress,
+        to: recipient,
+        amount: parseFloat(amount),
+        secretSeed,
       });
 
       if (response.success) {
