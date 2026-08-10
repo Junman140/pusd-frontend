@@ -15,7 +15,15 @@ export function QuickActions({ onMint, onRedeem }: QuickActionsProps) {
   const [sendOpen, setSendOpen] = useState(false);
   const [receiveOpen, setReceiveOpen] = useState(false);
 
-  const actions = [
+  const actions: Array<{
+    label: string;
+    icon: React.ComponentType<{ className?: string }>;
+    onClick: () => void;
+    iconBg: string;
+    iconColor: string;
+    disabled?: boolean;
+    href?: string;
+  }> = [
     {
       label: 'Mint',
       icon: ArrowDownLeft,
