@@ -20,7 +20,7 @@ jobs:
         with:
           source-directory: '.'       
           destination-github-username: 'junman140'
-          destination-repository-name: 'USDP-TEST-FRONTEND'
+          destination-repository-name: 'PUSD-TEST-FRONTEND'
           user-email: 'github-actions[bot]@users.noreply.github.com'
           user-name: 'GitHub Actions'
           target-branch: 'main'

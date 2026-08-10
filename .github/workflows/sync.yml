@@ -21,23 +21,23 @@ jobs:
 
       - name: Push to destination (Vercel) repo
         env:
-          DESTINATION_REPO: "https://junman140:${{ secrets.API_TOKEN_GITHUB }}@github.com/junman140/USDP-TEST-FRONTEND.git"
+          DESTINATION_REPO: "https://junman140:${{ secrets.API_TOKEN_GITHUB }}@github.com/junman140/PUSD-TEST-FRONTEND.git"
         run: |
           # Try to clone main branch first, if it fails, create the repo structure
-          if git clone "$DESTINATION_REPO" --branch main --single-branch temp_usdp_test_frontend 2>/dev/null; then
+          if git clone "$DESTINATION_REPO" --branch main --single-branch temp_pusd_test_frontend 2>/dev/null; then
             echo "✅ Cloned main branch successfully"
           else
             echo "⚠️ Repository or main branch doesn't exist, creating..."
-            mkdir -p temp_usdp_test_frontend
-            cd temp_usdp_test_frontend
+            mkdir -p temp_pusd_test_frontend
+            cd temp_pusd_test_frontend
             git init
             git checkout -b main
             git remote add origin "$DESTINATION_REPO"
             cd ..
           fi
           
-          rsync -av --delete --exclude '.git' --exclude '.github/workflows' ./ temp_usdp_test_frontend/
-          cd temp_usdp_test_frontend
+          rsync -av --delete --exclude '.git' --exclude '.github/workflows' ./ temp_pusd_test_frontend/
+          cd temp_pusd_test_frontend
           
           # Configure git if not already done
           git config user.email "github-actions[bot]@users.noreply.github.com"

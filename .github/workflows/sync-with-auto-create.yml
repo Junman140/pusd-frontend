@@ -24,7 +24,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.API_TOKEN_GITHUB }}
         run: |
-          REPO_NAME="USDP-TEST-FRONTEND"
+          REPO_NAME="PUSD-TEST-FRONTEND"
           OWNER="junman140"
           
           # Check if repo exists
@@ -42,7 +42,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.API_TOKEN_GITHUB }}
         run: |
-          REPO_NAME="USDP-TEST-FRONTEND"
+          REPO_NAME="PUSD-TEST-FRONTEND"
           OWNER="junman140"
           
           echo "Creating repository $OWNER/$REPO_NAME..."
@@ -58,13 +58,13 @@ jobs:
 
       - name: Push to destination (Vercel) repo
         env:
-          DESTINATION_REPO: "https://junman140:${{ secrets.API_TOKEN_GITHUB }}@github.com/junman140/USDP-TEST-FRONTEND.git"
+          DESTINATION_REPO: "https://junman140:${{ secrets.API_TOKEN_GITHUB }}@github.com/junman140/PUSD-TEST-FRONTEND.git"
         run: |
           # Clone the repository
-          git clone "$DESTINATION_REPO" --branch main --single-branch temp_usdp_test_frontend || {
+          git clone "$DESTINATION_REPO" --branch main --single-branch temp_pusd_test_frontend || {
             echo "⚠️ Failed to clone, trying to initialize..."
-            mkdir -p temp_usdp_test_frontend
-            cd temp_usdp_test_frontend
+            mkdir -p temp_pusd_test_frontend
+            cd temp_pusd_test_frontend
             git init
             git checkout -b main
             git remote add origin "$DESTINATION_REPO"
@@ -73,11 +73,11 @@ jobs:
             git commit -m "Initial commit"
             git push -u origin main || true
             cd ..
-            git clone "$DESTINATION_REPO" --branch main --single-branch temp_usdp_test_frontend
+            git clone "$DESTINATION_REPO" --branch main --single-branch temp_pusd_test_frontend
           }
           
-          rsync -av --delete --exclude '.git' --exclude '.github/workflows' ./ temp_usdp_test_frontend/
-          cd temp_usdp_test_frontend
+          rsync -av --delete --exclude '.git' --exclude '.github/workflows' ./ temp_pusd_test_frontend/
+          cd temp_pusd_test_frontend
           
           # Configure git
           git config user.email "github-actions[bot]@users.noreply.github.com"
