@@ -111,9 +111,10 @@ export function WalletManager() {
     setIsCreating(true);
     try {
       const data = await apiClient.createWallet();
+      const walletData = data.data as { publicKey?: string; secretKey?: string; passphrase?: string } | undefined;
 
-      if (data.success && data.data?.publicKey && data.data?.secretKey) {
-        const { publicKey, secretKey, passphrase } = data.data as { publicKey: string; secretKey: string; passphrase?: string };
+      if (data.success && walletData?.publicKey && walletData?.secretKey) {
+        const { publicKey, secretKey, passphrase } = walletData;
 
         await useAuthStore.getState().saveWalletLocally(publicKey, secretKey);
         useWalletStore.getState().setWalletAddress(publicKey);
