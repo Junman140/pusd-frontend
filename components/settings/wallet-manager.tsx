@@ -232,7 +232,7 @@ export function WalletManager() {
                         <Label htmlFor="secret-input" className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
                           Stellar Secret Key
                         </Label>
-                        <span className="text-[10px] font-medium text-primary/60 italic">Starts with "S"</span>
+                        <span className="text-[10px] font-medium text-primary/60 italic">Starts with &quot;S&quot;</span>
                       </div>
                       <div className="relative group">
                         <Input
